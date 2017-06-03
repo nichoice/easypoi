@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nic.mapper.EventMapper">
+    <resultMap id="EventsMap" type="com.nic.pojo.Event">
+        <id column="seqence" property="seqence" jdbcType="INTEGER"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="device" property="device" jdbcType="INTEGER"/>
+        <result column="code" property="code" jdbcType="INTEGER"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="time" property="time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="jiegou" type="com.nic.pojo.Resultmap">
+        <result column="code" property="code" jdbcType="INTEGER" />
+        <result column="time" property="time" jdbcType="TIMESTAMP" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="note" property="note" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="Devices_List">
+    seqence, type, device, code, description, time
+  </sql>
+
+    <select id="getEvents" resultMap="EventsMap">
+    select * from events
+  </select>
+
+    <select id="getEventsbyTime" resultMap="EventsMap" parameterType="java.util.HashMap">
+        select
+        *
+        from events
+        where 1 = 1
+        <if test="type != null and type != '' ">
+            and
+            type = #{type}
+        </if>
+        <if test="device != null and device != '' ">
+            and
+            device = #{device}
+        </if>
+        <if test="code != null and code != '' ">
+            and
+            code = #{code}
+        </if>
+        <if test="startTime != null and startTime != '' ">
+            and
+            time between #{startTime}
+        </if>
+        <if test="endTime != null and endTime != '' ">
+            and
+            #{endTime}
+        </if>
+    </select>
+
+    <select id="find" resultMap="jiegou" parameterType="java.util.HashMap">
+        select
+        e.time , d.name , t.note
+        from
+        events e
+        left join devices d on e.device = d.type
+        left join event_type t on d.type = t.type
+        where
+        1 = 1
+        <if test="type != null and type != '' ">
+            and
+            type = #{type}
+        </if>
+        <if test="device != null and device != '' ">
+            and
+            device = #{device}
+        </if>
+        <if test="code != null and code != '' ">
+            and
+            code = #{code}
+        </if>
+        <if test="startTime != null and startTime != '' ">
+            and
+            time between like '%#{startTime}%'
+        </if>
+        <if test="endTime != null and endTime != '' ">
+            and
+            like '%#{endTime}%'
+        </if>
+    </select>
+
+</mapper>
